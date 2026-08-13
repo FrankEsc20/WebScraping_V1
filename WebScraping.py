@@ -7,117 +7,90 @@ import numpy as np
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-import undetected_chromedriver as uc
+from selenium.webdriver.firefox.options import Options
+#import undetected_chromedriver as uc
+import funciones as fn
+
+#############################################################################################################################################
+
+# Ponemos las opciones de formatos:
+pd.set_option('display.max_columns', None) # Opción para que se puedan ver todas las columnas en el print:
+pd.options.display.float_format = '{:.6f}'.format # Opcion para que no se ponga en notación cientifica
+
+#############################################################################################################################################
+
+#HEADERS = {
+#    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
+#    '(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+#    'Accept-Language': 'en-US,en;q=0.9',
+#    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+#}
+
+# Abrimos el navegador, iniciamos sesion con el correo sin usar google paara que no nos bloquee el inicio de sesion.
+browser = webdriver.Chrome()
+browser.get('https://myjobs.indeed.com/applied')
 
 
-HEADERS = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-    "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    "Accept-Language": "en-US,en;q=0.9",
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-}
+#Obtenemos el HTML de la página
+html = browser.page_source
+html
+# Le damos un mejor formato al HTML para poder analizarlo mejor
+soup = bs(html, 'html.parser')
+soup
+
+#Obtenemos el primer trabajo de la lista de trabajos aplicados:
+job = soup.find('header', {'class': 'atw-JobInfo'}).find('a', {'class': 'atw-JobInfo-jobTitle'}).find(string=True, recursive=False).strip()
+job
 
 
-def build_indeed_url(query: str, location: str, start: int = 0) -> str:
-    """Build an Indeed search URL."""
-    base = "https://www.indeed.com/jobs"
-    params = {
-        "q": query,
-        "l": location,
-        "start": start,
-    }
-    return requests.Request("GET", base, params=params).prepare().url
+# Ahora pasamos a conseguir la lista de trabajos aplicados y sus links para poder acceder a ellos y obtener la información que necesitamos.
+jobs = soup.find_all('header', {'class': 'atw-JobInfo'})
+jobs
+# Ahora obtenemos el status de los trabajos aplicados y los guardamos en una lista.
+status = [job.find('div', {'class': 'atw-JobInfo-statusTag'}).find(string=True).strip() for job in jobs]
+status
+# Ahora obtenemos los nombres de los trabajos aplicados y los guardamos en una lista.
+nombres = [job.find('a', {'class': 'atw-JobInfo-jobTitle'}).find(string=True, recursive=False).strip() for job in jobs]
+nombres
+# Obtenemos los links de los trabajos aplicados y los guardamos en una lista.
+links = [job.find('a', {'class': 'atw-JobInfo-jobTitle'})['href'] for job in jobs]
+links
+#Obtenemos los patrones de los trabajos aplicados y los guardamos en una lista.
+patrones = [job.find('div', {'class': 'atw-JobInfo-companyLocation'}).find(string=True).strip() for job in jobs]
+patrones
+#Obtenemos los lugares de los trabajos aplicados y los guardamos en una lista.
+lugares = [job.find('div', {'class': 'atw-JobInfo-companyLocation'}).find_all(string=True)[1].strip() for job in jobs]
+lugares
+#Obtenemos las fechas de los trabajos aplicados y los guardamos en una lista.
+fechas = [job.find('div', {'class': 'css-1afmp4o e37uo190'}).find_all(string=True)[0].strip() for job in jobs]
+fechas
+
+# Traemos igual todos los div con el estatus de los trabajos aplicados para poder obtener la caducidad de los mismos.
+div_status = soup.find_all('div', {'class': 'atw-AppliedJobActions-labels'})
+div_status
+
+#Obtenemos la caducidad de los trabajos aplicados y los guardamos en una lista.
+caducidad = [div.find('div', {'class': 'atw-JobWarningLabel-text'}).get_text(strip=True)
+    if div.find('div', {'class': 'atw-JobWarningLabel-text'})
+    else None
+    for div in div_status
+]
+caducidad
 
 
-def get_page(url: str) -> BeautifulSoup:
-    """Fetch and parse a single Indeed page."""
-    response = requests.get(url, headers=HEADERS, timeout=20)
-    response.raise_for_status()
-    return BeautifulSoup(response.text, "html.parser")
+###########################################################################################################################################
+#Creamos un DataFrame con la información obtenida.
+df = pd.DataFrame({'Nombre': nombres, 'Patron': patrones, 'Lugar': lugares, 'Estatus': status, 'Caducidad': caducidad, 'Fecha_Str': fechas, 'Link': links})
+# Creamos una nueva columna 'Fecha' en el DataFrame aplicando la función convertir_fecha a la columna 'Fecha_Str'.
+df['Fecha'] = df['Fecha_Str'].apply(fn.convertir_fecha)
+# Creamos la columna de la página de la que se extrajo la información, en este caso 'Indeed'.
+df['Pagina'] = 'Indeed'
+df['Caducidad'] = np.where(df['Caducidad'].isnull(), 'Sigue abierto el empleo', df['Caducidad'])
+# Ahora le damos orden a las columnas del DataFrame para que queden en el orden que queremos.
+df = df[['Nombre', 'Fecha', 'Patron', 'Lugar', 'Estatus', 'Caducidad', 'Pagina', 'Fecha_Str', 'Link']]
+df
 
+# Guardamos el DataFrame en un archivo CSV.
+df.to_csv('trabajos_aplicados.csv', index=False)
 
-def clean_text(element) -> str:
-    if element is None:
-        return ""
-    return re.sub(r"\s+", " ", element.get_text(" ", strip=True))
-
-
-def get_job_link(card) -> str:
-    anchor = card.select_one("h2 a")
-    if not anchor:
-        anchor = card.select_one("a[jobtitle]")
-    if not anchor:
-        return ""
-    href = anchor.get("href", "")
-    if href.startswith("/"):
-        return "https://www.indeed.com" + href
-    return href
-
-
-def extract_jobs_from_page(soup: BeautifulSoup) -> List[Dict[str, str]]:
-    jobs = []
-    cards = soup.select("div.job_seen_beacon")
-
-    if not cards:
-        cards = soup.select("div. jobsearch-SerpJobCard")
-
-    for card in cards:
-        title = card.select_one("h2.jobTitle a")
-        if title is None:
-            title = card.select_one("h2 a")
-        if title is None:
-            continue
-
-        job = {
-            "title": clean_text(title),
-            "company": clean_text(card.select_one("span.companyName")),
-            "location": clean_text(card.select_one("div.companyLocation")),
-            "salary": clean_text(card.select_one("div.metadata.salary-snippet-container")),
-            "summary": clean_text(card.select_one("div.job-snippet")),
-            "link": get_job_link(card),
-        }
-
-        if job["title"]:
-            jobs.append(job)
-
-    return jobs
-
-
-def scrape_indeed(query: str, location: str, pages: int = 5, sleep_time: float = 2.0) -> pd.DataFrame:
-    """Scrape job listings from Indeed for a given keyword and location."""
-    all_jobs = []
-
-    for page in range(pages):
-        start = page * 10
-        url = build_indeed_url(query=query, location=location, start=start)
-        print(f"Fetching page {page + 1}: {url}")
-
-        try:
-            soup = get_page(url)
-        except requests.exceptions.RequestException as exc:
-            print(f"Error while fetching {url}: {exc}")
-            break
-
-        jobs = extract_jobs_from_page(soup)
-        if not jobs:
-            print("No jobs found on this page. Stopping.")
-            break
-
-        all_jobs.extend(jobs)
-
-        if page < pages - 1:
-            time.sleep(sleep_time)
-
-    return pd.DataFrame(all_jobs)
-
-
-if __name__ == "__main__":
-    query = "python developer"
-    location = "United States"
-    jobs_df = scrape_indeed(query=query, location=location, pages=3)
-
-    print(f"Found {len(jobs_df)} jobs.")
-    print(jobs_df.head())
-
-    jobs_df.to_csv("indeed_jobs.csv", index=False)
-    print("Saved results to indeed_jobs.csv")
+#browser.quit()
