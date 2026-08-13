@@ -1,10 +1,13 @@
-import time
-import re
-from typing import List, Dict, Optional
-
-import pandas as pd
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup as bs
+import random
+import time
+import pandas as pd
+import numpy as np
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+import undetected_chromedriver as uc
 
 
 HEADERS = {
