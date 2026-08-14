@@ -8,6 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
 #import undetected_chromedriver as uc
 import funciones as fn
 
@@ -30,6 +31,15 @@ pd.options.display.float_format = '{:.6f}'.format # Opcion para que no se ponga 
 browser = webdriver.Chrome()
 browser.get('https://myjobs.indeed.com/applied')
 
+# Esperamos a que el usuario termine de autenticarse manualmente.
+# Selenium continuará automáticamente cuando aparezca al menos un trabajo aplicado.
+from selenium.webdriver.support.ui import WebDriverWait
+WebDriverWait(browser, 300).until(
+    lambda driver: driver.find_elements(By.CSS_SELECTOR, 'header.atw-JobInfo')
+)
+
+# Esperamos un intervalo aleatorio para permitir que la página termine de cargar su contenido.
+time.sleep(random.uniform(2, 5))
 
 #Obtenemos el HTML de la página
 html = browser.page_source
