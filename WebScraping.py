@@ -1,8 +1,15 @@
 import pandas as pd
 import time
+from pathlib import Path
 
 from WebScraping_Indeed import ejecutar_indeed
 
+###########################################################################################################################################
+# Gestión de salidas:
+###########################################################################################################################################
+# Creamos la carpeta de salida si no existe
+OUTPUT_DIR = Path('outputs')
+OUTPUT_DIR.mkdir(exist_ok=True)
 
 ###########################################################################################################################################
 # Ejecutamos los scrapers:
@@ -25,4 +32,4 @@ df = pd.concat(
 # Guardamos el DataFrame final:
 ###########################################################################################################################################
 
-df.to_csv('trabajos_aplicados.csv', index=False)
+df.to_csv(OUTPUT_DIR / 'trabajos_aplicados.csv', index=False)
