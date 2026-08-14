@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 
 # Definimos una función para convertir la fecha en un formato más legible.
-def convertir_fecha(fecha):
+def convertir_fecha_indeed(fecha):
     dias_semana = {
         "lunes": 0,
         "martes": 1,
