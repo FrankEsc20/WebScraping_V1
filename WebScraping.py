@@ -103,4 +103,6 @@ df
 # Guardamos el DataFrame en un archivo CSV.
 df.to_csv('trabajos_aplicados.csv', index=False)
 
-#browser.quit()
+# Esperamos un tiempo aleatorio antes de cerrar el navegador para simular un comportamiento humano y evitar ser bloqueados por la página.
+time.sleep(random.uniform(3, 5))
+browser.quit()
