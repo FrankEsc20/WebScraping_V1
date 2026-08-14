@@ -27,6 +27,9 @@ pd.options.display.float_format = '{:.6f}'.format # Opcion para que no se ponga 
 #    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
 #}
 
+###########################################################################################################################################
+# Empezamos por Indeed:
+###########################################################################################################################################
 # Abrimos el navegador, iniciamos sesion con el correo sin usar google paara que no nos bloquee el inicio de sesion.
 browser = webdriver.Chrome()
 browser.get('https://myjobs.indeed.com/applied')
@@ -90,18 +93,18 @@ caducidad
 
 ###########################################################################################################################################
 #Creamos un DataFrame con la información obtenida.
-df = pd.DataFrame({'Nombre': nombres, 'Patron': patrones, 'Lugar': lugares, 'Estatus': status, 'Caducidad': caducidad, 'Fecha_Str': fechas, 'Link': links})
+df_indeed = pd.DataFrame({'Nombre': nombres, 'Patron': patrones, 'Lugar': lugares, 'Estatus': status, 'Caducidad': caducidad, 'Fecha_Str': fechas, 'Link': links})
 # Creamos una nueva columna 'Fecha' en el DataFrame aplicando la función convertir_fecha a la columna 'Fecha_Str'.
-df['Fecha'] = df['Fecha_Str'].apply(fn.convertir_fecha_indeed)
+df_indeed['Fecha'] = df_indeed['Fecha_Str'].apply(fn.convertir_fecha_indeed)
 # Creamos la columna de la página de la que se extrajo la información, en este caso 'Indeed'.
-df['Pagina'] = 'Indeed'
-df['Caducidad'] = np.where(df['Caducidad'].isnull(), 'Sigue abierto el empleo', df['Caducidad'])
+df_indeed['Pagina'] = 'Indeed'
+df_indeed['Caducidad'] = np.where(df_indeed['Caducidad'].isnull(), 'Sigue abierto el empleo', df_indeed['Caducidad'])
 # Ahora le damos orden a las columnas del DataFrame para que queden en el orden que queremos.
-df = df[['Nombre', 'Fecha', 'Patron', 'Lugar', 'Estatus', 'Caducidad', 'Pagina', 'Fecha_Str', 'Link']]
-df
+df_indeed = df_indeed[['Nombre', 'Fecha', 'Patron', 'Lugar', 'Estatus', 'Caducidad', 'Pagina', 'Fecha_Str', 'Link']]
+df_indeed
 
 # Guardamos el DataFrame en un archivo CSV.
-df.to_csv('trabajos_aplicados.csv', index=False)
+df_indeed.to_csv('trabajos_aplicados.csv', index=False)
 
 # Esperamos un tiempo aleatorio antes de cerrar el navegador para simular un comportamiento humano y evitar ser bloqueados por la página.
 time.sleep(random.uniform(3, 5))
