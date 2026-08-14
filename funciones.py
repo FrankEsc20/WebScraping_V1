@@ -31,6 +31,18 @@ def convertir_fecha(fecha):
     fecha = fecha.lower().strip()
     hoy = datetime.today()
 
+    # Si la postulación fue hoy, devolvemos la fecha de hoy.
+    if "hoy" in fecha:
+        return hoy.date()
+
+    # Si la postulación fue ayer, devolvemos la fecha de ayer.
+    if "ayer" in fecha and "anteayer" not in fecha and "antier" not in fecha:
+        return (hoy - timedelta(days=1)).date()
+
+    # Si la postulación fue anteayer, devolvemos la fecha de anteayer.
+    if "antier" in fecha or "anteayer" in fecha:
+        return (hoy - timedelta(days=2)).date()
+
     # Fecha expresada como día de la semana
     for dia, numero in dias_semana.items():
         if dia in fecha:
