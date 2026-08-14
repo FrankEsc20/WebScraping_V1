@@ -46,41 +46,30 @@ time.sleep(random.uniform(2, 5))
 
 #Obtenemos el HTML de la página
 html = browser.page_source
-html
 # Le damos un mejor formato al HTML para poder analizarlo mejor
 soup = bs(html, 'html.parser')
-soup
 
 #Obtenemos el primer trabajo de la lista de trabajos aplicados:
 job = soup.find('header', {'class': 'atw-JobInfo'}).find('a', {'class': 'atw-JobInfo-jobTitle'}).find(string=True, recursive=False).strip()
-job
 
 
 # Ahora pasamos a conseguir la lista de trabajos aplicados y sus links para poder acceder a ellos y obtener la información que necesitamos.
 jobs = soup.find_all('header', {'class': 'atw-JobInfo'})
-jobs
 # Ahora obtenemos el status de los trabajos aplicados y los guardamos en una lista.
 status = [job.find('div', {'class': 'atw-JobInfo-statusTag'}).find(string=True).strip() for job in jobs]
-status
 # Ahora obtenemos los nombres de los trabajos aplicados y los guardamos en una lista.
 nombres = [job.find('a', {'class': 'atw-JobInfo-jobTitle'}).find(string=True, recursive=False).strip() for job in jobs]
-nombres
 # Obtenemos los links de los trabajos aplicados y los guardamos en una lista.
 links = [job.find('a', {'class': 'atw-JobInfo-jobTitle'})['href'] for job in jobs]
-links
 #Obtenemos los patrones de los trabajos aplicados y los guardamos en una lista.
 patrones = [job.find('div', {'class': 'atw-JobInfo-companyLocation'}).find(string=True).strip() for job in jobs]
-patrones
 #Obtenemos los lugares de los trabajos aplicados y los guardamos en una lista.
 lugares = [job.find('div', {'class': 'atw-JobInfo-companyLocation'}).find_all(string=True)[1].strip() for job in jobs]
-lugares
 #Obtenemos las fechas de los trabajos aplicados y los guardamos en una lista.
 fechas = [job.find('div', {'class': 'css-1afmp4o e37uo190'}).find_all(string=True)[0].strip() for job in jobs]
-fechas
 
 # Traemos igual todos los div con el estatus de los trabajos aplicados para poder obtener la caducidad de los mismos.
 div_status = soup.find_all('div', {'class': 'atw-AppliedJobActions-labels'})
-div_status
 
 #Obtenemos la caducidad de los trabajos aplicados y los guardamos en una lista.
 caducidad = [div.find('div', {'class': 'atw-JobWarningLabel-text'}).get_text(strip=True)
@@ -88,7 +77,6 @@ caducidad = [div.find('div', {'class': 'atw-JobWarningLabel-text'}).get_text(str
     else None
     for div in div_status
 ]
-caducidad
 
 
 ###########################################################################################################################################
