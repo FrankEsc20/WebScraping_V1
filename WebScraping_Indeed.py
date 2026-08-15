@@ -42,7 +42,6 @@ def ejecutar_indeed():
 
         # Esperamos a que el usuario termine de autenticarse manualmente.
         # Selenium continuará automáticamente cuando aparezca al menos un trabajo aplicado.
-        from selenium.webdriver.support.ui import WebDriverWait
         WebDriverWait(browser, 300).until(
             lambda driver: driver.find_elements(By.CSS_SELECTOR, 'header.atw-JobInfo')
         )
