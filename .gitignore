@@ -17,3 +17,5 @@ outputs/
 
 # Datos generados
 *.csv
+notebooks/
+trabajos_aplicados_V1.csv
