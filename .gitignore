@@ -1,2 +1,19 @@
 trabajos_aplicados.csv
 Web Scraping JaviDS.ipynb
+
+# Entorno virtual
+.venv/
+.venv-uc/
+
+# Configuración local de VS Code
+.vscode/
+
+# Caché de Python
+__pycache__/
+*.pyc
+
+# Archivos de salida
+outputs/
+
+# Datos generados
+*.csv
