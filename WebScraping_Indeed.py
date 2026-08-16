@@ -100,7 +100,16 @@ def ejecutar_indeed():
         df['Pagina'] = 'Indeed'
         df['Caducidad'] = np.where(df['Caducidad'].isnull(), 'Sigue abierto el empleo', df['Caducidad'])
         # Ahora le damos orden a las columnas del DataFrame para que queden en el orden que queremos.
-        df = df[['Nombre', 'Fecha', 'Patron', 'Lugar', 'Estatus', 'Caducidad', 'Pagina', 'Fecha_Str', 'Link']]
+        df = df[['Nombre', 
+                 'Fecha', 
+                 'Patron', 
+                 'Lugar', 
+                 'Estatus', 
+                 'Caducidad', 
+                 'Pagina', 
+                 'Fecha_Str', 
+                 'Link']]
+
         return df
     finally:
         # Guardamos el DataFrame en un archivo CSV.
