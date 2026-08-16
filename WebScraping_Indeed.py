@@ -86,7 +86,14 @@ def ejecutar_indeed():
 
         ###########################################################################################################################################
         #Creamos un DataFrame con la información obtenida.
-        df = pd.DataFrame({'Nombre': nombres, 'Patron': patrones, 'Lugar': lugares, 'Estatus': status, 'Caducidad': caducidad, 'Fecha_Str': fechas, 'Link': links})
+        df = pd.DataFrame(
+            {'Nombre': nombres, 
+             'Patron': patrones, 
+             'Lugar': lugares, 
+             'Estatus': status, 
+             'Caducidad': caducidad, 
+             'Fecha_Str': fechas, 
+             'Link': links})
         # Creamos una nueva columna 'Fecha' en el DataFrame aplicando la función convertir_fecha a la columna 'Fecha_Str'.
         df['Fecha'] = df['Fecha_Str'].apply(fn.convertir_fecha_indeed)
         # Creamos la columna de la página de la que se extrajo la información, en este caso 'Indeed'.
