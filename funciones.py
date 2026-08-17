@@ -1,8 +1,10 @@
 
 # Importamos librerias que pueden servir:
-from datetime import datetime, timedelta
-from datetime import datetime, timedelta
+import os
 import re
+import pandas as pd
+from datetime import datetime, timedelta
+from datetime import datetime, timedelta
 
 
 # Definimos una función para convertir la fecha en un formato más legible.
@@ -136,3 +138,33 @@ def convertir_fecha_computrabajo(fecha_str):
 
     # Si no se reconoce el formato
     return None
+
+
+# Función para recuperar las fechas históricas de los trabajos aplicados:
+def recuperar_fechas_anteriores(df, archivo_anterior):
+    """
+    Recupera las fechas históricas de los trabajos que actualmente
+    tienen Fecha = None, utilizando el Link como identificador.
+    """
+
+    if not os.path.exists(archivo_anterior):
+        return df
+
+    df_anterior = pd.read_csv(archivo_anterior)
+
+    fechas_anteriores = (
+        df_anterior
+        .dropna(subset=['Fecha'])
+        .drop_duplicates(subset=['Link'])
+        .set_index('Link')['Fecha']
+        .to_dict()
+    )
+
+    df['Fecha'] = df.apply(
+        lambda fila: fechas_anteriores.get(fila['Link'], fila['Fecha'])
+        if pd.isna(fila['Fecha'])
+        else fila['Fecha'],
+        axis=1
+    )
+
+    return df
