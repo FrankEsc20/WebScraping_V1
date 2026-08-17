@@ -4,9 +4,11 @@
 import requests
 from bs4 import BeautifulSoup as bs
 import random
+import re
 import time
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -21,14 +23,12 @@ import funciones as fn
 pd.set_option('display.max_columns', None) # Opción para que se puedan ver todas las columnas en el print:
 pd.options.display.float_format = '{:.6f}'.format # Opcion para que no se ponga en notación cientifica
 
-#############################################################################################################################################
-
-#HEADERS = {
-#    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 '
-#    '(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
-#    'Accept-Language': 'en-US,en;q=0.9',
-#    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-#}
+###########################################################################################################################################
+# Gestión de salidas:
+###########################################################################################################################################
+# Creamos la carpeta de salida si no existe
+OUTPUT_HISTORY = Path('data/history')
+OUTPUT_HISTORY.mkdir(parents=True, exist_ok=True)
 
 ###########################################################################################################################################
 # Empezamos por Indeed:
@@ -113,7 +113,7 @@ def ejecutar_indeed():
         return df
     finally:
         # Guardamos el DataFrame en un archivo CSV.
-        #df.to_csv('trabajos_aplicados.csv', index=False)
+        df.to_csv(OUTPUT_HISTORY / 'trabajos_aplicados_indeed.csv', index=False)
     
         # Esperamos un tiempo aleatorio antes de cerrar el navegador para simular un comportamiento humano y evitar ser bloqueados por la página.
         time.sleep(random.uniform(3, 5))
