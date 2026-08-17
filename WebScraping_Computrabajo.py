@@ -193,9 +193,6 @@ def ejecutar_computrabajo():
         # Recuperamos las fechas históricas de los trabajos aplicados:
         df = fn.recuperar_fechas_anteriores(df, archivo)
 
-        # Guardamos el archivo actualizado:
-        #df.to_csv(archivo, index=False)
-
         return df
     finally:
         # Guardamos el DataFrame en un archivo CSV.
