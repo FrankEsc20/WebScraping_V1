@@ -14,8 +14,12 @@ __pycache__/
 
 # Archivos de salida
 outputs/
+data/
 
 # Datos generados
 *.csv
 notebooks/
 trabajos_aplicados_V1.csv
+
+# Preferencias de la MacBook:
+.DS_Store

@@ -4,11 +4,11 @@
 import requests
 from bs4 import BeautifulSoup as bs
 import random
-import os
 import re
 import time
 import pandas as pd
 import numpy as np
+from pathlib import Path
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -22,6 +22,13 @@ import funciones as fn
 # Ponemos las opciones de formatos:
 pd.set_option('display.max_columns', None) # Opción para que se puedan ver todas las columnas en el print:
 pd.options.display.float_format = '{:.6f}'.format # Opcion para que no se ponga en notación cientifica
+
+###########################################################################################################################################
+# Gestión de salidas:
+###########################################################################################################################################
+# Creamos la carpeta de salida si no existe
+OUTPUT_HISTORY = Path('data/history')
+OUTPUT_HISTORY.mkdir(parents=True, exist_ok=True)
 
 ###########################################################################################################################################
 # Empezamos por Computrabajo:
@@ -44,6 +51,10 @@ def ejecutar_computrabajo():
 
         # Definimos la primera iteracion:
         i = 1
+
+        # Ponemos un espacio para mejor legibilidad
+        print('')
+        print('Comenzando el proceso de scraping de Computrabajo...')
 
         # Comenzmos a iterar sobre las páginas de resultados 
         # hasta que no haya más trabajos aplicados.
@@ -160,7 +171,7 @@ def ejecutar_computrabajo():
                 break 
             
         # Definimos el nombre del archivo CSV donde guardaremos los datos obtenidos anteriormente:
-        archivo = os.path.join('outputs', 'trabajos_aplicados_computrabajo.csv')
+        archivo = OUTPUT_HISTORY / 'trabajos_aplicados_computrabajo.csv'
 
         # Creamos una nueva columna 'Fecha' en el DataFrame aplicando la función convertir_fecha a la columna 'Fecha_Str'.
         df['Fecha'] = df['Fecha_Str'].apply(fn.convertir_fecha_computrabajo)
@@ -188,7 +199,7 @@ def ejecutar_computrabajo():
         return df
     finally:
         # Guardamos el DataFrame en un archivo CSV.
-        #df.to_csv('trabajos_aplicados.csv', index=False)
+        df.to_csv(OUTPUT_HISTORY / 'trabajos_aplicados_computrabajo.csv', index=False)
     
         # Esperamos un tiempo aleatorio antes de cerrar el navegador para simular un comportamiento humano y evitar ser bloqueados por la página.
         time.sleep(random.uniform(3, 5))
