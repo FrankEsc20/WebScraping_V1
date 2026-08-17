@@ -34,10 +34,6 @@ df = pd.concat(
     ignore_index=True
 )
 
-# Guardamos los DataFrames secundarios en archivos CSV individuales:
-# df_indeed.to_csv(OUTPUT_DIR / 'trabajos_aplicados_indeed.csv', index=False)
-
-
 ###########################################################################################################################################
 # Guardamos el DataFrame final:
 ###########################################################################################################################################
