@@ -1,5 +1,9 @@
+
 # Importamos librerias que pueden servir:
 from datetime import datetime, timedelta
+from datetime import datetime, timedelta
+import re
+
 
 # Definimos una función para convertir la fecha en un formato más legible.
 def convertir_fecha_indeed(fecha):
@@ -70,4 +74,65 @@ def convertir_fecha_indeed(fecha):
 
     except (ValueError, KeyError):
         return None
-        
+
+
+
+# Función para convertir la fecha de Computrabajo a formato datetime:
+def convertir_fecha_computrabajo(fecha_str):
+    """
+    Convierte las fechas obtenidas de Computrabajo a formato datetime.
+    """
+
+    fecha_str = fecha_str.strip().lower()
+    ahora = datetime.now()
+
+    # Caso: "Más de 30 días"
+    if "más de 30 días" in fecha_str:
+        return None
+
+    # Caso: "Hace X horas"
+    match_horas = re.search(r'hace\s+(\d+)\s+horas?', fecha_str)
+
+    if match_horas:
+        horas = int(match_horas.group(1))
+        return (ahora - timedelta(hours=horas)).date()
+
+    # Caso: "Hace X días"
+    match_dias = re.search(r'hace\s+(\d+)\s+días?', fecha_str)
+
+    if match_dias:
+        dias = int(match_dias.group(1))
+        return (ahora - timedelta(days=dias)).date()
+
+    # Caso: "6 de agosto"
+    match_fecha = re.search(
+        r'(\d{1,2})\s+de\s+([a-záéíóú]+)',
+        fecha_str
+    )
+
+    if match_fecha:
+        dia = int(match_fecha.group(1))
+        mes_nombre = match_fecha.group(2)
+
+        meses = {
+            'enero': 1,
+            'febrero': 2,
+            'marzo': 3,
+            'abril': 4,
+            'mayo': 5,
+            'junio': 6,
+            'julio': 7,
+            'agosto': 8,
+            'septiembre': 9,
+            'octubre': 10,
+            'noviembre': 11,
+            'diciembre': 12
+        }
+
+        mes = meses.get(mes_nombre)
+
+        if mes:
+            return datetime(ahora.year, mes, dia).date()
+
+    # Si no se reconoce el formato
+    return None
